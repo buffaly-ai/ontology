@@ -1,82 +1,55 @@
-# Ontology.Core
-*A production-ready prototype graph runtime for healthcare and beyond*
+# Ontology Core
 
-> **Buffaly** is a neurosymbolic platform for building large, explainable knowledge graphs and running language-aware inference over them.
-> It is powered by **Ontology** (a prototype graph runtime) and **ProtoScript** (an executable language for defining prototypes, rules, and functions).
+Ontology Core is the prototype graph runtime used by Buffaly for semantic entities, typed objects, inheritance, parsing, and simulation.
 
-This repository contains the ontology runtime and its parser/simulation projects.
+Buffaly is a field-tested runtime for high-trust agents, developed by Matt Furnari. This repository is part of the public `buffaly-ai` source release and is intended for inspection, debugging, plugin/tool development, partner integration, and LLM-assisted understanding.
 
-## Scope
-This repository is part of the open-source split of our platform.
-It does **not** include several commercial components (partner-only datasets, agentic tooling, and medical extensions).
+## How this fits into Buffaly
 
-## ✨ Key capabilities (Ontology runtime)
-| Feature | Why it matters |
-|---|---|
-| 🧬 **Prototype graph** | Typed nodes, property edges, child collections, and multi-parent `TypeOf` inheritance. |
-| 🧭 **Graph navigation** | Structural comparison, categorization checks, and path/parameterization primitives. |
-| 🧰 **Interop** | Native-value prototypes and reflection utilities for bridging CLR values into the graph. |
-| 🧪 **Simulation helpers** | Runtime support for downstream parsers, interpreters, and workflows. |
+Buffaly uses Ontology as the semantic object model underneath typed actions, tools, and agent routing.
 
-## What This Repo Owns
-1. `Ontology` - core runtime types (`Prototype`, properties, children, inheritance, conversions).
-2. `Ontology.Parsers` - parsing utilities for ontology data.
-3. `Ontology.Simulation` - simulation/runtime support utilities.
+## What is in this repository
 
-## Solution
-- `Ontology.Core.sln`
+- Ontology runtime
+- Parser support
+- Simulation support
+- Tests for graph/runtime behavior
 
-Current solution membership:
-- `Ontology`
-- `Ontology.Parsers`
-- `Ontology.Simulation`
+## Repository map
 
-## 🚀 Quick start (as source)
-```csharp
-using Ontology;
+- `Ontology.Parsers/Ontology.Parsers.csproj`
+- `Ontology.Simulation/Ontology.Simulation.csproj`
+- `Ontology.Tests/Ontology.Tests.csproj`
+- `Ontology/Ontology.csproj`
 
-Initializer.Initialize();
+## Build
 
-Prototype animal = Prototypes.GetOrInsertPrototype("Animal");
-Prototype dog = Prototypes.GetOrInsertPrototype("Dog", "Animal");
-Prototype fido = dog.CreateInstance("Fido");
-
-Console.WriteLine(fido.TypeOf(animal)); // True
-```
-
-## 🛠 Build
-The split repos are designed to sit as **siblings** on disk so `Scripts\update_dlls.bat` can copy DLLs between `..\ontology-core`, `..\protoscript-core`, and `..\buffaly-nlu`.
-If you clone into different folder names, update the paths inside `Scripts\update_dlls.bat`.
-
-From repo root:
+This repository is source-visible first. The installer is still the recommended path for normal use, but the source is here so developers and partners can inspect behavior, debug integrations, and build plugins/tools.
 
 ```powershell
-Scripts\update_dlls.bat
-dotnet build Ontology.Core.sln
+# From this repository root
+dotnet restore Ontology.Core.sln
+dotnet build Ontology.Core.sln --configuration Release
 ```
 
-## 🧪 Tests
-There are currently no repo-local `*Tests*.csproj` projects in this repo.
-ProtoScript unit/integration tests live in `ProtoScript.Core` (`ProtoScript.Tests` and `ProtoScript.Tests.Integration`).
+Some repositories include partner/closed support binaries under `lib/` so the public source can compile without immediately open-sourcing every historical dependency. More dependencies may be opened over time as time allows.
 
-## 📦 Dependency model
-- Shared binaries are resolved from local `lib\` and `Deploy\`.
-- `Scripts\update_dlls.bat` refreshes DLLs used by local builds.
+## Configuration and secrets
 
-## Related repositories
-- Ontology core: https://github.com/Intelligence-Factory-LLC/Ontology.Core
-- ProtoScript core: https://github.com/Intelligence-Factory-LLC/ProtoScript.Core
-- Buffaly NLU: https://github.com/Intelligence-Factory-LLC/Buffaly.NLU
+No secrets are required for core ontology development. Generated parser/build outputs should remain uncommitted.
 
-## 🛡 License
-Ontology.Core is released under the **GNU General Public License v3.0**.
-See [`LICENSE`](LICENSE).
+If you add examples, keep them as placeholders. Never commit PHI, customer data, credentials, OAuth tokens, API keys, bearer tokens, connection strings with passwords, private browser state, or live run/session artifacts.
 
-## 🏥 Need help?
-We deploy explainable, neurosymbolic systems in regulated domains (healthcare and beyond).
-For Buffaly guidance, source access, plugin development, or partner integration, visit **https://buffa.ly** or open an issue in the appropriate Buffaly repository.
+## What is intentionally not included
 
-*© 2026 Matt Furnari*
+Private ontologies, customer data, healthcare workflows, and domain packs are not included.
+
+Some domain packs, healthcare workflows, customer-specific connectors, deployment assets, implementation playbooks, sensitive demos/data, and private operational configuration remain separate from the public core.
+
+## Using this source
+
+The source is provided to make Buffaly inspectable and useful for builders who want to understand the runtime, debug integrations, or create plugins and tools. For most users, the installer/runtime package is the fastest path. If you are building proprietary products, redistributing Buffaly, or need supported deployment terms, use the commercial licensing route below.
+
 ## Licensing
 
 Buffaly core is GPLv3 by default. If your organization needs different terms for proprietary use, redistribution, or supported deployment, contact us for commercial licensing.
@@ -85,3 +58,10 @@ Buffaly is developed by Matt Furnari.
 
 See [LICENSING.md](LICENSING.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Commercial licensing
+
+Commercial licensing is available for organizations that need different terms for proprietary use, redistribution, private embedding, hosted product use, or supported deployment. Open a GitHub issue in this repository with the label `commercial-licensing` to start that discussion.
+
+## Contributions
+
+Major external code contributions are expected to require a Contributor License Agreement (CLA). Small documentation fixes, typo fixes, and issue reports may be handled without a CLA at the maintainer's discretion.
