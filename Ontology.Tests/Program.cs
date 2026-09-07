@@ -21,8 +21,8 @@ internal static class Program
 			(nameof(IntWrapperCtor_AcceptsIntWrapperPrototype), IntWrapperCtor_AcceptsIntWrapperPrototype),
 			(nameof(BoolWrapperCtor_AcceptsBoolWrapperPrototype), BoolWrapperCtor_AcceptsBoolWrapperPrototype),
 			(nameof(DoubleWrapperCtor_AcceptsDoubleWrapperPrototype), DoubleWrapperCtor_AcceptsDoubleWrapperPrototype),
-			(nameof(NestedParent_TracksDirectDottedParent), NestedParent_TracksDirectDottedParent),
-			(nameof(NestedParent_TracksDirectDottedParent_WhenParentCreatedAfterChild), NestedParent_TracksDirectDottedParent_WhenParentCreatedAfterChild),
+			(nameof(NestedParent_ExplicitLink), NestedParent_ExplicitLink),
+			(nameof(NestedParent_ExplicitLinkAfterParentCreated), NestedParent_ExplicitLinkAfterParentCreated),
 		};
 
 		int failed = 0;
@@ -185,27 +185,35 @@ internal static class Program
 		AssertTrue(clone.GetDoubleValue() == 3.5d, "Expected DoubleWrapper(Prototype) to accept DoubleWrapper input and preserve value.");
 	}
 
-	private static void NestedParent_TracksDirectDottedParent()
+	private static void NestedParent_ExplicitLink()
 	{
 		Initializer.ResetCache();
 
 		Prototype parent = Prototypes.GetOrInsertPrototype("test.nested.parent");
 		Prototype child = Prototypes.GetOrInsertPrototype("test.nested.parent.child");
 
-		Prototype? nestedParent = GetNestedParent(child);
+		AssertTrue(GetNestedParent(child) == null, "Generic insertion must not infer declaration nesting.");
+        child.InsertNestedParent(parent.PrototypeID);
+        child.InsertNestedParent(parent.PrototypeID);
+        AssertTrue(GetNestedChildren(parent).Count(x => x.PrototypeID == child.PrototypeID) == 1, "Explicit link must be idempotent.");
+        Prototype? nestedParent = GetNestedParent(child);
 		AssertTrue(nestedParent != null, "Expected child prototype to expose a direct NestedParent.");
 		AssertTrue(nestedParent.PrototypeID == parent.PrototypeID, "Expected NestedParent to resolve the direct dotted parent prototype.");
 		AssertTrue(GetNestedChildren(parent).Any(x => x.PrototypeID == child.PrototypeID), "Expected parent prototype to expose the child through GetNestedChildren().");
 	}
 
-	private static void NestedParent_TracksDirectDottedParent_WhenParentCreatedAfterChild()
+	private static void NestedParent_ExplicitLinkAfterParentCreated()
 	{
 		Initializer.ResetCache();
 
 		Prototype child = Prototypes.GetOrInsertPrototype("test.outoforder.parent.child");
 		Prototype parent = Prototypes.GetOrInsertPrototype("test.outoforder.parent");
 
-		Prototype? nestedParent = GetNestedParent(child);
+		AssertTrue(GetNestedParent(child) == null, "Generic insertion must not infer declaration nesting.");
+        child.InsertNestedParent(parent.PrototypeID);
+        child.InsertNestedParent(parent.PrototypeID);
+        AssertTrue(GetNestedChildren(parent).Count(x => x.PrototypeID == child.PrototypeID) == 1, "Explicit link must be idempotent.");
+        Prototype? nestedParent = GetNestedParent(child);
 		AssertTrue(nestedParent != null, "Expected child prototype to pick up NestedParent after the direct dotted parent is created.");
 		AssertTrue(nestedParent.PrototypeID == parent.PrototypeID, "Expected NestedParent to resolve the later-created direct dotted parent prototype.");
 		AssertTrue(GetNestedChildren(parent).Any(x => x.PrototypeID == child.PrototypeID), "Expected later-created parent prototype to expose the pre-existing child through GetNestedChildren().");
